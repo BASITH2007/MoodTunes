@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emotion Sync Music Engine — Django AI Edition</title>
+  
+  <!-- Modern Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  
+  <!-- face-api.js Fork CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  
+  <!-- Django Static CSS -->
+  <link rel="stylesheet" href="{% static 'detector/css/styles.css' %}" />
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loadingOverlay">
+    <div class="loader-ring"></div>
+    <div class="loader-text" id="loaderTitle">Loading AI Models</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="loader-sub" id="loaderSub">Fetching face detection models from local server...</div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">Emotion Sync Music Engine</div>
+      <div class="status-pill">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText">Loading...</span>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>Music that <span>feels</span> like you</h1>
+      <p>Real-time emotion detection via camera or text — powered by Django & Browser AI.</p>
+    </section>
+
+    <!-- Main Workspace -->
+    <div class="main-grid">
+      <!-- Input Controls (Camera / Text) -->
+      <div>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('camera')">📸 Camera</button>
+          <button class="tab" onclick="switchTab('text')">✍️ Text</button>
+        </div>
+
+        <!-- Camera Tab -->
+        <div class="tab-content active" id="tab-camera">
+          <div class="card">
+            <div class="card-label">Live Face Detection</div>
+            <div id="cameraWrap">
+              <div class="cam-placeholder" id="camPlaceholder">
+                <div class="icon">📷</div>
+                <p>Camera preview<br>will appear here</p>
+              </div>
+              <video id="video" autoplay muted playsinline></video>
+              <canvas id="canvas"></canvas>
+              <div class="detecting-badge" id="detectingBadge">
+                <div class="dot"></div> Detecting...
+              </div>
+            </div>
+            <div class="cam-controls">
+              <button class="btn btn-primary" id="startBtn" onclick="startCamera()">▶ Start Camera</button>
+              <button class="btn btn-danger" id="stopBtn" onclick="stopCamera()" style="display:none">⏹ Stop</button>
+              <button class="btn btn-secondary" id="snapBtn" onclick="snapEmotion()" style="display:none">📸 Snap</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text Tab -->
+        <div class="tab-content" id="tab-text">
+          <div class="card">
+            <div class="card-label">How are you feeling?</div>
+            <textarea id="moodText" placeholder="Type how you're feeling... e.g., 'I am feeling really happy and excited today!' or 'I'm feeling a bit down and stressed'"></textarea>
+            <div class="cam-controls" style="margin-top:12px">
+              <button class="btn btn-primary" onclick="analyzeText()">🔍 Analyze Mood</button>
+              <button class="btn btn-secondary" onclick="document.getElementById('moodText').value=''">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detection Output Display -->
+      <div class="card">
+        <div class="card-label">Detected Emotion</div>
+        <div id="waitingState" class="waiting-state">
+          <div class="big-emoji">🎭</div>
+          <p>Start camera or type your feelings<br>to detect your mood</p>
+        </div>
+        <div id="emotionDisplay" class="emotion-display" style="display:none">
+          <span class="emotion-emoji" id="emotionEmoji">😊</span>
+          <div class="emotion-name" id="emotionName">Happy</div>
+          <div class="emotion-confidence" id="emotionConf">Confidence: 0%</div>
+          <div class="emotion-bars" id="emotionBars"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations Playlist Section -->
+    <section class="playlist-section">
+      <div id="playlistWaiting" class="waiting-state" style="padding: 20px 0">
+        <p>🎵 Your mood playlist will load from the database</p>
+      </div>
+      <div id="playlistSection" style="display:none">
+        <div class="section-title">
+          🎵 Recommended Playlist
+          <span class="mood-badge" id="playlistBadge">Happy</span>
+        </div>
+        <div class="tracks-grid" id="tracksGrid"></div>
+      </div>
+    </section>
+
+    <!-- Detections History Log -->
+    <section class="history-section">
+      <div class="section-title">
+        ⏳ Recent Detections History
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">Loading history...</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bridge Django static path to JS -->
+  <script>
+    window.STATIC_MODELS_URL = "{% static 'detector/models/' %}";
+  </script>
+  
+  <!-- Django Static JS -->
+  <script src="{% static 'detector/js/detector.js' %}"></script>
+</body>
+</html>
