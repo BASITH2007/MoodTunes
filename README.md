@@ -1,4 +1,4 @@
-# 🎵 Emotion Sync Music Engine (Django AI Edition)
+# 🎵 Emotion Sync Music Engine (Django)
 
 A full-stack Django web application that detects user emotions in real-time (via face detection in the camera feed or text-based feelings analysis) and recommends a music playlist matching their mood.
 
